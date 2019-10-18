@@ -1,46 +1,45 @@
-# Introduction
+# 简介
 
-This doc gives an introduction of the Open Application Model in a story-based format. Its goal is to help end users and developers quickly understand and implement the specification.
+本文档以基于故事的形式介绍开放应用模型。其目标是帮助最终用户和开发人员快速理解和实施规范。
 
-In the following, we go through a story that describes an application delivery lifecycle. The storyline looks like this:
+在下文中，我们将讲述一个描述应用程序交付生命周期的故事。故事情节如下：
 
-1. The _developer_ creates a web application;
-2. The _application operator_ deploys instances of that application, and configures it with operational traits, such as autoscaling;
-3. The _infrastructure operator_ decides which underlying technology is used to handle the deployment and operations.
+1. _开发者_ 创建了一个Web应用程序；
+2. _应用运维人员_ 将该应用程序部署为运行实例，并配置上运维相关的特性，例如自动缩放；
+3. _基础设施运维人员_ 决定使用哪种底层技术来支持部署和运维。
 
-## Application developer: Write and test code
+## 应用开发者：编写并测试代码
 
-The story begins with the application developers who create an application, such as an online shopping application. They know how to write and test the code. The program takes a few parameters such as log level and HTTP port. To let the developers focus on implementing the application's business logic, application operators (either human or automated operation platforms) take care of operational tasks. This provides a "serverless" experience to the developers. The developers only need to develop and package the application, and then deliver it to the application operators.
+故事开始于创建应用程序（例如一个在线购物的应用程序）的开发者。他们知道该如何编写和测试代码。这个程序提供了一些运行参数，例如日志级别和HTTP端口。为了让开发者能够专注于实现应用程序的业务逻辑，应用运维角色（运维人员或自动操作平台）将承担运维相关的任务。这为开发者提供“服务器无感”的体验，他们只需开发和打包应用程序，然后将其交付给应用运维人员。
 
-To deliver their application, the developers define _ComponentSchematic_ YAML files. In the _Open Application Model_, each individual component of a program is described as a _ComponentSchematic_ YAML by the application developer. This file encapsulates a workload and the information needed to run it. For example, it can contain the container image packaging the program, whether it needs an endpoint, if its designed to run as a task to completion or as a server, environment variables, and any parameters the developers want to expose to an operator to override at deployment time. 
+为了顺利交付应用程序，开发者定义了 _组件描述_ 的YAML文件。在 _开放应用模型_ 中，应用开发者会将程序中的每个独立组件都描述为 _组件描述_ YAML文件。该文件将封装一个工作负载以及运行它所需的所有信息。例如，它可以描述应用使用的容器镜像、是否需要暴露端口、是作为任务运行还是作为服务运行、环境变量以及开发者要提供给运维人员可在部署时进行配置的参数。
 
-The following diagram demonstrates this workflow:
+下图演示了此工作流程：
 
 ![alt](./assets/dev2ops.png)
 
-## Application operator: Deploy and operate applications
+## 应用运维人员：部署和运维应用
 
-To run and operate an application, the application operator sets parameter values for the developers' components and applies operational characteristics, such as replica size, autoscaling policy, ingress points, and traffic routing rules in an _ApplicationConfiguration_ yaml. In OAM, these operational characteristics are called _traits_. Writing and deploying a _ApplicationConfiguration_ yaml is equivalent to deploying an application. The underlying platform will create live instances of _ComponentSchematic_ and attach operational traits to them according to the _ApplicationConfiguration_ spec.
+为了运行和运维应用程序，应用运维人员在一个 _应用配置项_ YAML文件中，为开发者的组件设置运行参数和应用运维特性，例如副本大小、自动缩放策略、入口点和流量路由规则等。在开放应用模型中，这些运维参数被称为 _特征(traits)_。 编写和部署 _应用配置项_ YAML文件等同于部署应用程序。基础设施平台将根据 _组件描述_ 创建运行实例，并根据 _应用配置项_ 规范将运维特征附加上去。
 
-The following diagram demonstrates the workflow:
+下图演示了此工作流程：
 
 ![alt](./assets/ops-deploy-app.png)
 
-## Infrastructure operator: configure platform capabilities
+## 基础设施运维人员：配置平台能力
 
-The application developer and application operator have so far described an application and its operational characteristics in platform-neutral terms. The power of the Open Application Model comes from the underlying platforms that implements the model, which can surface the capabilities that make the underlying platforms unique and useful through OAM in a way that is consistent across any platform that supports the model.
+到目前为止，应用开发者和应用运维人员已经使用平台无关的术语描述了应用程序及其运维特性。开放应用模型的能力来自实现该模型的基础平台，任何实现开放应用模型规范的底层平台都可以提供功能一致的运行能力。
 
-Infrastructure operators are responsible for declaring, installing, and maintaining the underlying services that are available on the platform. For example, an infrastructure operator might choose a specific load balancer technology when deploying to a cloud provider to expose the service.
+基础设施运维人员负责声明、安装和维护平台上可用的基础服务。例如，基础设施运维人员在部署到云提供商以提供服务时可能会选择特定的负载均衡器技术。
 
-The following diagram demonstrates the platform architecture:
+下图演示了此工作流程：
 
 ![alt](./assets/platform_arch.png)
 
+## 写给平台设计者
 
-## For platform builders
+_开放应用模型_ 专注于通过与平台无关的规范将开发关注点与运维事项分离，将模块化、可扩展和可移植的设计用于在Kubernetes等平台之上构建和交付应用程序。
 
-Focused on the separation of development concerns from operational considerations through a platform-agnostic specification, the _Open Application Model_ brings modular, extensible, and portable design to building and delivering applications on platforms like Kubernetes.
+使用开放应用模型，平台设计者可以提供 _组件_、_特征_ 和 _能力_ 格式的可重用模块。这将允许平台进行相应的处理，譬如将它们打包成许多预定义的应用配置文件。用户可以通过选择配置文件来选择如何运行其应用程序，例如，具有较高SLO要求的微服务应用程序、需要持久卷的有状态应用程序、或具有水平伸缩能力的事件驱动函数。归功于模块化的设计，这些特性将以云原生方式为终端用户带来服务器无感的体验。
 
-With OAM, platform builders can provide reusable modules in the format of _Components_, _Traits_, and _Scopes_. This allows platforms to do things like package them in predefined application profiles. Users choose how to run their applications by selecting profiles, for example, microservice apps with high SLO requirements, stateful apps with persistent volumes, or event driven functions with horizontally autoscaling. This brings a serverless experience to end users in a cloud native way, all due to the modular design.
-
-Another benefit for end users is having portable apps across platforms. If an app can be deployed and used on one provider, it should be able to run on any other providers. We define must-implement, recommended, and candidate types in _core_, _standard_, and _extended_ APIs. This will ensure portability and provide extensibility in the same spec. Of course, not everything is portable and the primary concern of such an interface is that it is a "lowest-common denominator". Our aspiration is to build a vendor-neutral, community-owned spec and the most popular APIs will be embraced and added to the specification over time. In this way, the evolution will ensure that most users will be successful in building cloud native applications via the Open Application Model.
+此规范对于终端用户的另一个好处，是可以跨平台使用便携式应用程序。只要应用能够在一个平台供应商上部署和运行，则该应用也应当能够在其他任何（实现此规范的）平台上运行。我们对 _核心_、_标准_ 和 _扩展_ API都分别按必须实现、推荐实现、备选实现进行了划分。这将确保规范的可移植性和可扩展性。当然，并不是所有的东西都可移植，因而设计这种接口时主要考虑因素是，它应该“尽可能的通用”。我们的愿望是建立与供应商无关的、由社区所有的规范，随着时间的推移，最受欢迎的API将被采用并添加到规范中。保持持续演进，从而确保大多数用户都将能够通过开放应用模型成功构筑云原生的应用程序。
